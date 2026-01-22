@@ -1,5 +1,25 @@
 import express from 'express';
-import { deleteUserById, getUsers } from '../db/users';
+import { deleteUserById, getUserById, getUsers } from '../db/users';
+
+export const getUser = async(req: express.Request, res: express.Response) => {
+  try {
+    const id = String(req.params.id);
+
+    if(!id) {
+      return res.sendStatus(403);
+    }
+
+    const user = await getUserById(id);
+    if(!user) {
+      return res.sendStatus(403);
+    }
+
+    return res.status(200).json(user).end();
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
+  }
+}
 
 export const getAllUsers = async(req: express.Request, res:express.Response) => {
   try {
@@ -21,6 +41,26 @@ export const deleteUser = async(req: express.Request, res:express.Response) => {
     return res.json(deletedUser);
   } catch (error) {
     console.log(error);
+    return res.sendStatus(400)
+  }
+}
+
+export const updateUser = async(req:express.Request, res:express.Response) => {
+  try {
+    const id = String(req.params.id);
+    const { username } = req.body;
+
+    if(!username){
+      return res.sendStatus(400);
+    }
+
+    const user = await getUserById(id);
+    user.username = username
+    await user.save()
+
+    return res.status(200).json(user).end();
+  } catch (error) {
+    console.log(error)
     return res.sendStatus(400)
   }
 }
