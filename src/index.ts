@@ -1,34 +1,15 @@
-import express from 'express';
+import 'dotenv/config';
 import http from 'http';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import compression from 'compression';
-import cors from 'cors';
-import mongoose from 'mongoose';
+import app from './app';
 
-import router from './router';
+import { connectDB } from './config/database';
+import { env } from './config/env';
 
-
-const app = express();
-
-app.use(cors({
-  credentials: true
-}));
-
-app.use(compression());
-app.use(cookieParser());
-app.use(bodyParser.json());
+const PORT = env.PORT;
 
 const server = http.createServer(app);
+connectDB();
 
-server.listen(8000, () => {
-  console.log("Server running on http://localhost:8000/")
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}/`)
 });
-
-const MONGO_URL = "mongodb+srv://admin:admin@cluster0.6qx5a.mongodb.net/tsAPI";
-
-mongoose.Promise = Promise;
-mongoose.connect(MONGO_URL);
-mongoose.connection.on('error', (error: Error) => console.log(error));
-
-app.use('/', router())
