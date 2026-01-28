@@ -1,49 +1,37 @@
 import { Request, Response } from 'express';
-import { deleteUserById, getUserById, getUsers } from '../db/users';
+import * as userService from "../services/user.service";
 
 import { catchAsync } from '../middlewares/catchAsync';
-import { ApiError } from '../errors/ApiError';
+
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
 
-  if(!id) {
-    throw new ApiError(403, "Invalid id");
-  }
-
-  const user = await getUserById(id);
-  if(!user) {
-    throw new ApiError(403, "Invalid user");
-  }
+  const user = await userService.getUser(id);
 
   res.status(200).json(user);
 })
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await getUsers();
-
-  if(!users) {
-    throw new ApiError(404, "Users not found")
-  }
+  const users = await userService.getAllUsers();
 
   res.status(200).json(users);
 })
 
-export const deleteUser = async(req: Request, res: Response) => {
+export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
 
-  const deletedUser = await deleteUserById(id);
+  const deletedUser = await userService.deleteUser(id);
 
   res.json(deletedUser);
-}
+});
 
-export const updateUser = async(req: Request, res: Response) => {
+export const updateUser = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const { username } = req.body;
 
-  const user = await getUserById(id);
-  user.username = username
+  const user = await userService.updateUser(id, username);
   await user.save()
 
   res.status(200).json(user);
-}
+});
