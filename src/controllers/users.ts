@@ -41,10 +41,6 @@ export const updateUser = async(req: Request, res: Response) => {
   const id = String(req.params.id);
   const { username } = req.body;
 
-  if(!username) {
-    throw new ApiError(400, "Invalid username");
-  }
-
   const user = await getUserById(id);
   user.username = username
   await user.save()

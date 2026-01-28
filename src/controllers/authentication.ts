@@ -8,16 +8,8 @@ import { catchAsync } from "../middlewares/catchAsync";
 export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  if(!email || !password) {
-    throw new ApiError(400, "Email and password are required");
-  }
-
   const user = await getUserByEmail(email)
     .select('+authentication.salt +authentication.password');
-
-  if(!user){
-    throw new ApiError(400, "Invalid email or password");
-  }
 
   const expectedHash = authentication(user.authentication.salt, password);
 
@@ -39,10 +31,6 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
 export const register = catchAsync(async (req: Request, res: Response) => {
   const { email, password, username } = req.body;
-
-  if(!email || !password || !username) {
-    throw new ApiError(400, "Email, password and username are required");
-  }
 
   const existingUser = await getUserByEmail(email);
 
